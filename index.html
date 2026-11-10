@@ -3,103 +3,99 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FZ Studio Barber | Peluquería y barbería en Luján</title>
-<meta name="description" content="FZ Studio Barber, barbería en Luján. Cortes, barba y perfilado. Reservá tu turno online.">
-<meta name="theme-color" content="#0b0b0b">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b0b0b'/><text x='50' y='64' font-size='44' text-anchor='middle' fill='%23d4a24c' font-family='Arial' font-weight='900'>FZ</text></svg>">
+<title>FZ Studio Barber | Barbería en Luján</title>
+<meta name="description" content="FZ Studio Barber, barbería en Luján. Atención personalizada. Reservá tu turno online.">
+<meta name="theme-color" content="#eee8dc">
+<link rel="icon" href="img/icon-192.png">
+<link rel="apple-touch-icon" href="img/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header class="nav" id="nav">
-  <a href="#inicio" class="logo">FZ<span>STUDIO BARBER</span></a>
+  <a href="#inicio" class="brand"><img src="img/logo.png" alt="FZ"><span>FZ Studio</span></a>
   <nav>
-    <a href="#servicios">Servicios</a>
+    <a href="#servicios">Servicio</a>
     <a href="#turnos">Turnos</a>
-    <a href="#galeria">Trabajos</a>
+    <a href="#local">El local</a>
     <a href="#contacto">Contacto</a>
   </nav>
   <a href="#turnos" class="btn btn-sm">Reservar</a>
 </header>
 
 <section class="hero" id="inicio">
-  <div class="hero-inner">
-    <p class="eyebrow">Luján · Buenos Aires</p>
-    <h1>Tu estilo,<br>nuestro oficio.</h1>
-    <p class="lead">Cortes clásicos y modernos, barba y perfilado con la mejor atención. Reservá tu turno online en menos de un minuto.</p>
-    <div class="cta">
-      <a href="#turnos" class="btn">Reservar turno</a>
-      <a href="#servicios" class="btn btn-ghost">Ver servicios</a>
-    </div>
+  <img class="hero-logo" src="img/logo.png" alt="FZ Studio">
+  <p class="eyebrow">Barbería · Luján</p>
+  <h1>Tu estilo,<br>nuestra dedicación.</h1>
+  <p class="lead">Un espacio donde el estilo, la precisión y los detalles hacen la diferencia. Atención personalizada, adaptada a tu imagen.</p>
+  <div class="cta">
+    <a href="#turnos" class="btn">Reservar turno</a>
+    <a href="#servicios" class="btn btn-ghost">Ver servicio</a>
   </div>
-  <div class="scroll">↓</div>
-</section>
-
-<section class="strip">
-  <div><b>+5</b><span>años de experiencia</span></div>
-  <div><b>100%</b><span>atención personalizada</span></div>
-  <div><b>Turnos</b><span>online 24/7</span></div>
 </section>
 
 <section class="section" id="servicios">
   <p class="eyebrow">Lo que hacemos</p>
-  <h2>Servicios</h2>
+  <h2>Servicio</h2>
   <div class="cards" id="serviceCards"></div>
 </section>
 
 <section class="section dark" id="turnos">
   <p class="eyebrow">Reservá online</p>
   <h2>Sacá tu turno</h2>
-  <p class="sub">Elegí servicio, día y horario. Te confirmamos por WhatsApp.</p>
+  <p class="sub">Elegí día y horario. Tu turno queda confirmado al instante.</p>
 
   <form id="booking" class="booking" autocomplete="off">
-    <div class="step">
-      <label>1 · Servicio</label>
+    <div class="step" id="svcStep" hidden>
+      <label>Servicio</label>
       <div class="chips" id="serviceChips"></div>
     </div>
     <div class="step">
-      <label>2 · Barbero</label>
-      <div class="chips" id="barberChips"></div>
-    </div>
-    <div class="step">
-      <label>3 · Día</label>
+      <label>1 · Día</label>
       <div class="chips days" id="dayChips"></div>
     </div>
     <div class="step">
-      <label>4 · Horario</label>
+      <label>2 · Horario</label>
       <div class="chips slots" id="slotChips"><span class="hint">Elegí primero un día</span></div>
     </div>
     <div class="step two">
       <div>
-        <label for="name">5 · Tu nombre</label>
-        <input id="name" type="text" placeholder="Nombre y apellido" required>
+        <label for="name">3 · Tu nombre</label>
+        <input id="name" type="text" placeholder="Nombre y apellido" maxlength="60" required>
       </div>
       <div>
         <label for="phone">Tu teléfono</label>
-        <input id="phone" type="tel" placeholder="2323 000000" required>
+        <input id="phone" type="tel" placeholder="2323 000000" maxlength="20" required>
       </div>
     </div>
+    <input type="text" name="website" id="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
     <div class="summary" id="summary">Completá los pasos para ver el resumen.</div>
-    <button class="btn btn-block" type="submit">Confirmar por WhatsApp</button>
-    <p class="fine">Al confirmar se abre WhatsApp con tu turno ya armado. Tu reserva queda confirmada cuando la barbería te responda.</p>
+    <p class="error" id="err" role="alert"></p>
+    <button class="btn btn-block" id="submitBtn" type="submit">Confirmar turno</button>
   </form>
+
+  <div class="booking done" id="done" hidden>
+    <div class="tick">✓</div>
+    <h3>¡Turno confirmado!</h3>
+    <p id="doneText"></p>
+    <a id="doneWa" class="btn" href="#" target="_blank" rel="noopener">Avisar por WhatsApp</a>
+    <button class="btn btn-ghost" id="again" type="button">Reservar otro</button>
+  </div>
 </section>
 
-<section class="section" id="galeria">
-  <p class="eyebrow">Nuestro trabajo</p>
-  <h2>Galería</h2>
-  <div class="gallery">
-    <div class="g g1"><span>Fade</span></div>
-    <div class="g g2"><span>Clásico</span></div>
-    <div class="g g3"><span>Barba</span></div>
-    <div class="g g4"><span>Diseño</span></div>
-    <div class="g g5"><span>Perfilado</span></div>
-    <div class="g g6"><span>Corte + barba</span></div>
+<section class="section" id="local">
+  <p class="eyebrow">Conocé el espacio</p>
+  <h2>El local</h2>
+  <div class="local">
+    <img src="img/local.png" alt="Interior de FZ Studio Barber" loading="lazy">
+    <div>
+      <p>Un lugar cómodo y prolijo, pensado para que disfrutes el momento y te vayas con tu mejor versión.</p>
+      <p class="fine">Seguinos en Instagram <a id="igLink" href="#" target="_blank" rel="noopener">@fz.sstudio</a> para ver más trabajos.</p>
+    </div>
   </div>
-  <p class="fine center">Seguinos en Instagram <a id="igLink" href="#" target="_blank" rel="noopener">@fzstudiobarber</a> para ver más trabajos.</p>
 </section>
 
 <section class="section dark" id="contacto">
@@ -120,12 +116,12 @@
 </section>
 
 <footer>
-  <div class="logo">FZ<span>STUDIO BARBER</span></div>
+  <img src="img/logo.png" alt="FZ" class="flogo">
   <p>© <span id="year"></span> FZ Studio Barber · Luján, Buenos Aires</p>
 </footer>
 
 <a id="waFloat" class="wa-float" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
-  <svg viewBox="0 0 32 32" width="28" height="28" fill="#fff"><path d="M16 3a13 13 0 0 0-11 19.8L3 29l6.4-2A13 13 0 1 0 16 3zm0 23.6a10.6 10.6 0 0 1-5.4-1.5l-.4-.2-3.8 1.2 1.2-3.7-.3-.4A10.6 10.6 0 1 1 16 26.600zm5.800-7.900c-.3-.2-1.900-.9-2.200-1s-.5-.2-.7.200-.8 1-1 1.200-.4.200-.7 0a8.700 8.700 0 0 1-4.300-3.800c-.3-.6.300-.5.900-1.700.1-.2 0-.4 0-.5l-1-2.300c-.2-.6-.5-.5-.7-.5h-.6a1.200 1.200 0 0 0-.9.400 3.700 3.700 0 0 0-1.100 2.700 6.400 6.400 0 0 0 1.400 3.400 14.600 14.600 0 0 0 5.600 4.900c2.100.9 2.900.9 3.400.8a3 3 0 0 0 2-1.400 2.500 2.500 0 0 0 .2-1.400c-.1-.1-.3-.2-.6-.4z"/></svg>
+  <svg viewBox="0 0 32 32" width="28" height="28" fill="#fff"><path d="M16 3a13 13 0 0 0-11 19.8L3 29l6.4-2A13 13 0 1 0 16 3zm0 23.6a10.600 10.600 0 0 1-5.400-1.500l-.4-.2-3.800 1.200 1.200-3.700-.3-.4A10.600 10.600 0 1 1 16 26.600zm5.800-7.900c-.3-.2-1.900-.9-2.200-1s-.5-.2-.7.200-.8 1-1 1.200-.4.200-.7 0a8.700 8.700 0 0 1-4.300-3.800c-.3-.6.300-.5.900-1.700.1-.2 0-.4 0-.5l-1-2.300c-.2-.6-.5-.5-.7-.5h-.6a1.200 1.200 0 0 0-.9.400 3.700 3.700 0 0 0-1.100 2.700 6.400 6.400 0 0 0 1.400 3.400 14.600 14.600 0 0 0 5.600 4.900c2.100.9 2.900.9 3.400.8a3 3 0 0 0 2-1.400 2.500 2.500 0 0 0 .2-1.400c-.1-.1-.3-.2-.6-.4z"/></svg>
 </a>
 
 <script src="app.js"></script>

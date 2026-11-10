@@ -1,158 +1,120 @@
-/* ============================================================
-   CONFIGURACIÓN — editá solo esta sección para personalizar
-   ============================================================ */
-const CONFIG = {
-  whatsapp: "5492323000000",            // número con código país, sin + ni espacios
-  instagram: "fzstudiobarber",          // usuario de Instagram
-  address: "Dirección de la barbería, Luján, Buenos Aires",
-  mapsQuery: "FZ Studio Barber Luján Buenos Aires",
-  daysAhead: 14,                        // cuántos días mostrar para reservar
-  slotMinutes: 30,                      // duración de cada turno
-  // horario por día de la semana (0=Dom ... 6=Sáb). null = cerrado
-  hours: {
-    0: null,
-    1: ["10:00", "20:00"],
-    2: ["10:00", "20:00"],
-    3: ["10:00", "20:00"],
-    4: ["10:00", "20:00"],
-    5: ["10:00", "20:00"],
-    6: ["10:00", "18:00"]
-  },
-  services: [
-    { id: "corte",  name: "Corte de pelo",   desc: "Clásico o moderno, a tu estilo.",     price: 8000,  min: 30 },
-    { id: "barba",  name: "Barba",           desc: "Perfilado y toalla caliente.",        price: 5000,  min: 30 },
-    { id: "combo",  name: "Corte + Barba",   desc: "El combo completo.",                  price: 12000, min: 60 },
-    { id: "fade",   name: "Fade / Degradé",  desc: "Degradé prolijo con terminación.",    price: 9000,  min: 45 },
-    { id: "perfil", name: "Perfilado",       desc: "Líneas y contornos al detalle.",      price: 3000,  min: 30 },
-    { id: "color",  name: "Color / Mechas",  desc: "Platinado, mechas y color.",          price: 20000, min: 90 }
-  ],
-  barbers: ["Cualquiera", "FZ"]          // agregá más nombres si hay otros barberos
-};
-/* ============================================================ */
-
 const $ = s => document.querySelector(s);
-const money = n => "$" + n.toLocaleString("es-AR");
 const DAYS = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
-const state = { service: null, barber: CONFIG.barbers[0], date: null, time: null };
+const money = n => "$" + n.toLocaleString("es-AR");
+const state = { service: null, date: null, time: null };
+let C;
 
-/* Turnos ya reservados desde este dispositivo (evita duplicar) */
-const store = {
-  get() { try { return JSON.parse(localStorage.getItem("fz_bookings") || "[]"); } catch { return []; } },
-  add(b) { try { localStorage.setItem("fz_bookings", JSON.stringify([...this.get(), b])); } catch {} }
-};
+const dparts = iso => { const [y, m, d] = iso.split("-").map(Number); return { y, m, d, dow: new Date(Date.UTC(y, m - 1, d)).getUTCDay() }; };
+const label = iso => { const p = dparts(iso); return `${DAYS[p.dow]} ${p.d} de ${MONTHS[p.m - 1]}`; };
 
-const pad = n => String(n).padStart(2, "0");
-const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
-
-function toMin(t) { const [h, m] = t.split(":").map(Number); return h * 60 + m; }
-function fromMin(m) { return `${pad(Math.floor(m / 60))}:${pad(m % 60)}`; }
-
-/* ---------- Servicios ---------- */
-$("#serviceCards").innerHTML = CONFIG.services.map(s => `
-  <div class="card"><h3>${s.name}</h3><p>${s.desc}</p>
-  <span class="price">${money(s.price)}</span><span class="dur">${s.min} min</span></div>`).join("");
-
-$("#serviceChips").innerHTML = CONFIG.services.map(s =>
-  `<button type="button" class="chip" data-id="${s.id}">${s.name}<small>${money(s.price)} · ${s.min} min</small></button>`).join("");
-$("#barberChips").innerHTML = CONFIG.barbers.map((b, i) =>
-  `<button type="button" class="chip${i === 0 ? " on" : ""}" data-b="${b}">${b}</button>`).join("");
-
-/* ---------- Días ---------- */
-const days = [];
-const today = new Date(); today.setHours(0, 0, 0, 0);
-for (let i = 0; i < CONFIG.daysAhead; i++) {
-  const d = new Date(today); d.setDate(today.getDate() + i);
-  if (CONFIG.hours[d.getDay()]) days.push(d);
+async function api(url, opts) {
+  const res = await fetch(url, opts);
+  const j = await res.json().catch(() => ({}));
+  if (!res.ok) throw Object.assign(new Error(j.error || "Error"), { status: res.status });
+  return j;
 }
-$("#dayChips").innerHTML = days.map(d =>
-  `<button type="button" class="chip" data-d="${iso(d)}">${DAYS[d.getDay()]}<b>${d.getDate()}</b><small>${MONTHS[d.getMonth()]}</small></button>`).join("");
 
-/* ---------- Horarios ---------- */
-function renderSlots() {
+async function init() {
+  try { C = await api("/api/config"); }
+  catch { $("#err").textContent = "No se pudo cargar la agenda. Probá recargar."; return; }
+  state.service = C.services[0];
+
+  $("#serviceCards").innerHTML = C.services.map(s =>
+    `<div class="card"><h3>${s.name}</h3><p>${s.desc}</p><span class="price">${money(s.price)}</span><span class="dur">${s.min >= 60 ? s.min / 60 + " h" : s.min + " min"}</span></div>`).join("");
+
+  if (C.services.length > 1) {
+    $("#svcStep").hidden = false;
+    $("#serviceChips").innerHTML = C.services.map((s, i) =>
+      `<button type="button" class="chip${i === 0 ? " on" : ""}" data-id="${s.id}">${s.name}<small>${money(s.price)}</small></button>`).join("");
+  }
+
+  // días disponibles
+  const base = new Date(C.today + "T00:00:00Z"), days = [];
+  for (let i = 0; i <= C.daysAhead; i++) {
+    const d = new Date(base.getTime() + i * 864e5), iso = d.toISOString().slice(0, 10);
+    if (C.hours[d.getUTCDay()]) days.push(iso);
+  }
+  $("#dayChips").innerHTML = days.map(iso => {
+    const p = dparts(iso);
+    return `<button type="button" class="chip" data-d="${iso}">${DAYS[p.dow]}<b>${p.d}</b><small>${MONTHS[p.m - 1]}</small></button>`;
+  }).join("");
+
+  const order = [1, 2, 3, 4, 5, 6, 0], full = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+  $("#hoursList").innerHTML = order.map(i => {
+    const h = C.hours[i];
+    return `<li><span>${full[i]}</span><span>${h ? h[0] + " – " + h[1] : "Cerrado"}</span></li>`;
+  }).join("");
+  $("#addr").textContent = C.city + " · " + C.phoneDisplay;
+  const wa = `https://wa.me/${C.phone}?text=${encodeURIComponent("Hola! Quería consultar por un turno.")}`;
+  $("#waLink").href = wa; $("#waFloat").href = wa;
+  $("#mapLink").href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(C.mapsQuery);
+  $("#igLink").href = "https://instagram.com/" + C.instagram;
+  $("#igLink").textContent = "@" + C.instagram;
+}
+
+async function loadSlots() {
   const box = $("#slotChips");
   if (!state.date) { box.innerHTML = '<span class="hint">Elegí primero un día</span>'; return; }
-  const [y, m, d] = state.date.split("-").map(Number);
-  const dt = new Date(y, m - 1, d);
-  const [open, close] = CONFIG.hours[dt.getDay()];
-  const dur = state.service ? state.service.min : CONFIG.slotMinutes;
-  const now = new Date();
-  const taken = store.get().filter(b => b.date === state.date && (b.barber === state.barber || b.barber === "Cualquiera" || state.barber === "Cualquiera"));
-  const out = [];
-  for (let t = toMin(open); t + dur <= toMin(close); t += CONFIG.slotMinutes) {
-    const past = iso(now) === state.date && t <= now.getHours() * 60 + now.getMinutes();
-    const busy = taken.some(b => t < b.start + b.dur && t + dur > b.start);
-    out.push(`<button type="button" class="chip${state.time === fromMin(t) ? " on" : ""}" data-t="${fromMin(t)}" ${past || busy ? "disabled" : ""}>${fromMin(t)}</button>`);
-  }
-  box.innerHTML = out.length ? out.join("") : '<span class="hint">Sin horarios disponibles</span>';
+  box.innerHTML = '<span class="hint">Cargando…</span>';
+  try {
+    const { slots } = await api("/api/slots?date=" + state.date);
+    if (!slots.some(s => s.free)) { box.innerHTML = '<span class="hint">No quedan horarios este día. Probá con otro.</span>'; return; }
+    box.innerHTML = slots.map(s => `<button type="button" class="chip${state.time === s.time ? " on" : ""}" data-t="${s.time}" ${s.free ? "" : "disabled"}>${s.time}</button>`).join("");
+  } catch { box.innerHTML = '<span class="hint">No se pudieron cargar los horarios.</span>'; }
 }
 
 function renderSummary() {
   const s = $("#summary");
-  if (!state.service || !state.date || !state.time) { s.innerHTML = "Completá los pasos para ver el resumen."; return; }
-  const [y, m, d] = state.date.split("-").map(Number);
-  const dt = new Date(y, m - 1, d);
-  s.innerHTML = `<b>${state.service.name}</b> con <b>${state.barber}</b><br>${DAYS[dt.getDay()]} ${d} de ${MONTHS[m - 1]} a las <b>${state.time} hs</b> · ${money(state.service.price)}`;
+  if (!state.date || !state.time) { s.textContent = "Completá los pasos para ver el resumen."; return; }
+  s.innerHTML = `<b>${state.service.name}</b><br>${label(state.date)} a las <b>${state.time} hs</b> · ${money(state.service.price)}`;
 }
 
-/* ---------- Eventos ---------- */
-function pick(containerSel, btn, cb) {
-  document.querySelectorAll(containerSel + " .chip").forEach(c => c.classList.remove("on"));
-  btn.classList.add("on"); cb();
-}
+function pick(sel, btn) { document.querySelectorAll(sel + " .chip").forEach(c => c.classList.remove("on")); btn.classList.add("on"); }
+
 $("#serviceChips").addEventListener("click", e => {
   const b = e.target.closest(".chip"); if (!b) return;
-  pick("#serviceChips", b, () => { state.service = CONFIG.services.find(s => s.id === b.dataset.id); state.time = null; renderSlots(); renderSummary(); });
-});
-$("#barberChips").addEventListener("click", e => {
-  const b = e.target.closest(".chip"); if (!b) return;
-  pick("#barberChips", b, () => { state.barber = b.dataset.b; state.time = null; renderSlots(); renderSummary(); });
+  pick("#serviceChips", b); state.service = C.services.find(s => s.id === b.dataset.id); renderSummary();
 });
 $("#dayChips").addEventListener("click", e => {
   const b = e.target.closest(".chip"); if (!b) return;
-  pick("#dayChips", b, () => { state.date = b.dataset.d; state.time = null; renderSlots(); renderSummary(); });
+  pick("#dayChips", b); state.date = b.dataset.d; state.time = null; renderSummary(); loadSlots();
 });
 $("#slotChips").addEventListener("click", e => {
   const b = e.target.closest(".chip"); if (!b || b.disabled) return;
-  state.time = b.dataset.t; renderSlots(); renderSummary();
+  pick("#slotChips", b); state.time = b.dataset.t; renderSummary();
 });
 
-$("#booking").addEventListener("submit", e => {
+$("#booking").addEventListener("submit", async e => {
   e.preventDefault();
-  if (!state.service) return alert("Elegí un servicio.");
-  if (!state.date) return alert("Elegí un día.");
-  if (!state.time) return alert("Elegí un horario.");
-  const name = $("#name").value.trim(), phone = $("#phone").value.trim();
-  if (!name || !phone) return alert("Completá tu nombre y teléfono.");
-  const [y, m, d] = state.date.split("-").map(Number);
-  const dt = new Date(y, m - 1, d);
-  const msg =
-`Hola! Quiero reservar un turno en FZ Studio Barber:
-• Servicio: ${state.service.name} (${money(state.service.price)})
-• Barbero: ${state.barber}
-• Día: ${DAYS[dt.getDay()]} ${d}/${m}
-• Hora: ${state.time} hs
-• Nombre: ${name}
-• Teléfono: ${phone}`;
-  store.add({ date: state.date, start: toMin(state.time), dur: state.service.min, barber: state.barber });
-  window.open(`https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
-  renderSlots();
+  const err = $("#err"); err.textContent = "";
+  if (!state.date) return (err.textContent = "Elegí un día.");
+  if (!state.time) return (err.textContent = "Elegí un horario.");
+  const btn = $("#submitBtn"); btn.disabled = true; btn.textContent = "Reservando…";
+  try {
+    const name = $("#name").value.trim(), phone = $("#phone").value.trim();
+    await api("/api/book", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, phone, date: state.date, time: state.time, service: state.service.id, website: $("#website").value })
+    });
+    $("#booking").hidden = true; $("#done").hidden = false;
+    $("#doneText").textContent = `${name}, te esperamos el ${label(state.date)} a las ${state.time} hs en FZ Studio.`;
+    const msg = `Hola! Reservé un turno en FZ Studio: ${state.service.name}, ${label(state.date)} ${state.time} hs. Nombre: ${name}.`;
+    $("#doneWa").href = `https://wa.me/${C.phone}?text=${encodeURIComponent(msg)}`;
+    $("#done").scrollIntoView({ behavior: "smooth", block: "center" });
+  } catch (x) {
+    err.textContent = x.message;
+    if (x.status === 409) { state.time = null; renderSummary(); loadSlots(); }
+  } finally { btn.disabled = false; btn.textContent = "Confirmar turno"; }
+});
+$("#again").addEventListener("click", () => {
+  $("#done").hidden = true; $("#booking").hidden = false;
+  state.date = state.time = null; $("#booking").reset();
+  document.querySelectorAll("#dayChips .chip").forEach(c => c.classList.remove("on"));
+  renderSummary(); loadSlots();
 });
 
-/* ---------- Contacto / horarios ---------- */
-const order = [1, 2, 3, 4, 5, 6, 0], full = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-$("#hoursList").innerHTML = order.map(i => {
-  const h = CONFIG.hours[i];
-  return `<li><span>${full[i]}</span><span>${h ? h[0] + " – " + h[1] : "Cerrado"}</span></li>`;
-}).join("");
-$("#addr").textContent = CONFIG.address;
-const wa = `https://wa.me/${CONFIG.whatsapp}?text=${encodeURIComponent("Hola! Quería consultar por un turno.")}`;
-$("#waLink").href = wa; $("#waFloat").href = wa;
-$("#mapLink").href = "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(CONFIG.mapsQuery);
-$("#igLink").href = "https://instagram.com/" + CONFIG.instagram;
-$("#igLink").textContent = "@" + CONFIG.instagram;
 $("#year").textContent = new Date().getFullYear();
-
-const nav = $("#nav");
-const onScroll = () => nav.classList.toggle("solid", scrollY > 40);
+const nav = $("#nav"), onScroll = () => nav.classList.toggle("solid", scrollY > 40);
 addEventListener("scroll", onScroll); onScroll();
+init();

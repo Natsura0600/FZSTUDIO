@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FZ Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#2e1a10">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="../img/icon-192.png">
+<link rel="apple-touch-icon" href="../img/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<style>
+:root{--bg:#eee8dc;--card:#f7f2e8;--ink:#2e1a10;--brown:#4a2a18;--accent:#8a5a35;--mut:#7a6a5c;--line:#d3c8b4;--ok:#2f7d4f;--bad:#a3271a}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.45;padding-bottom:90px}
+button{font:inherit;cursor:pointer}
+.top{background:var(--ink);color:var(--bg);padding:calc(14px + env(safe-area-inset-top)) 16px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.top img{width:36px;height:36px;border-radius:8px;background:var(--bg)}
+.top h1{font-size:1.1rem;flex:1}
+.top button{background:transparent;color:var(--bg);border:1px solid rgba(238,232,220,.4);border-radius:8px;padding:6px 10px;font-size:.8rem}
+.wrap{max-width:720px;margin:0 auto;padding:16px}
+.login{max-width:360px;margin:12vh auto;padding:0 20px;text-align:center}
+.login img{width:110px;mix-blend-mode:multiply}
+.login h2{margin:8px 0 18px}
+input,select{width:100%;background:#fff8;border:1px solid var(--line);padding:12px;border-radius:10px;font:inherit;color:var(--ink)}
+.btn{background:var(--brown);color:var(--bg);border:0;border-radius:10px;padding:12px 18px;font-weight:600}
+.btn.full{width:100%;margin-top:12px}
+.btn.ghost{background:transparent;color:var(--brown);border:1px solid var(--brown)}
+.err{color:var(--bad);font-size:.9rem;margin-top:10px;min-height:1.2em}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.stat b{display:block;font-size:1.5rem;color:var(--brown)}
+.stat span{font-size:.72rem;color:var(--mut)}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;color:var(--mut);font-weight:600}
+.tab.on{background:var(--brown);color:var(--bg);border-color:var(--brown)}
+.day{font-weight:700;color:var(--accent);margin:18px 0 8px;text-transform:capitalize}
+.item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;gap:12px}
+.item .t{font-weight:700;font-size:1.15rem;min-width:56px;color:var(--brown)}
+.item .m{flex:1;min-width:0}
+.item .n{font-weight:600;word-break:break-word}
+.item .s{font-size:.82rem;color:var(--mut)}
+.chip{display:inline-block;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.c-confirmed{background:#dbeedf;color:var(--ok)}
+.c-completed{background:#ddd;color:#555}
+.c-cancelled,.c-noshow{background:#f3d6d2;color:var(--bad)}
+.c-blocked{background:#e3d6c0;color:var(--accent)}
+.item.off{opacity:.55}
+.item.off .n{text-decoration:line-through}
+.acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.acts button,.acts a{background:#fff8;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:.8rem;color:var(--ink);text-decoration:none}
+.acts .ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+.acts .no{color:var(--bad)}
+.empty{text-align:center;color:var(--mut);padding:40px 0}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--brown);color:var(--bg);border:0;border-radius:999px;padding:14px 20px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:30}
+.sheet{background:var(--bg);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:20px;max-height:92vh;overflow:auto}
+.sheet h3{margin-bottom:12px}
+.sheet label{display:block;font-size:.8rem;font-weight:600;color:var(--accent);margin:12px 0 4px}
+.seg{display:flex;gap:8px}
+.seg button{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;font-weight:600}
+.seg button.on{background:var(--brown);color:var(--bg)}
+.row{display:flex;gap:8px;margin-top:16px}
+.row .btn{flex:1}
+.hint{font-size:.78rem;color:var(--mut);margin-top:12px}
+</style>
+</head>
+<body>
+
+<section id="loginView" class="login" hidden>
+  <img src="../img/logo.png" alt="FZ">
+  <h2>Panel de turnos</h2>
+  <form id="loginForm">
+    <input id="pass" type="password" placeholder="Contraseña" autocomplete="current-password" required>
+    <button class="btn full" type="submit">Entrar</button>
+    <p class="err" id="loginErr"></p>
+  </form>
+</section>
+
+<section id="appView" hidden>
+  <div class="top">
+    <img src="../img/logo.png" alt="">
+    <h1>FZ Studio · Turnos</h1>
+    <button id="refresh" type="button">Actualizar</button>
+    <button id="logout" type="button">Salir</button>
+  </div>
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat"><b id="sToday">0</b><span>Hoy</span></div>
+      <div class="stat"><b id="sNext">0</b><span>Próximos</span></div>
+      <div class="stat"><b id="sMoney">$0</b><span>Estimado del mes</span></div>
+    </div>
+    <div class="tabs">
+      <button class="tab on" data-v="today" type="button">Hoy</button>
+      <button class="tab" data-v="next" type="button">Próximos</button>
+      <button class="tab" data-v="past" type="button">Historial</button>
+    </div>
+    <div id="list"></div>
+  </div>
+  <button class="fab" id="fab" type="button">+ Turno</button>
+</section>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet">
+    <h3>Nuevo</h3>
+    <div class="seg" id="kind">
+      <button type="button" data-k="book" class="on">Turno manual</button>
+      <button type="button" data-k="block">Bloquear horario</button>
+    </div>
+    <label for="mDate">Día</label>
+    <select id="mDate"></select>
+    <label for="mTime">Horario</label>
+    <select id="mTime"></select>
+    <div id="mClient">
+      <label for="mName">Nombre del cliente</label>
+      <input id="mName" maxlength="60" placeholder="Nombre">
+      <label for="mPhone">Teléfono (opcional)</label>
+      <input id="mPhone" type="tel" placeholder="2323 000000">
+    </div>
+    <p class="err" id="mErr"></p>
+    <div class="row">
+      <button class="btn ghost" id="mCancel" type="button">Cancelar</button>
+      <button class="btn" id="mSave" type="button">Guardar</button>
+    </div>
+    <p class="hint">Solo se muestran horarios libres.</p>
+  </div>
+</div>
+
+<script src="admin.js"></script>
+</body>
+</html>
