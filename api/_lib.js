@@ -6,8 +6,8 @@ const CONFIG = {
   phone: "5492323448740",
   phoneDisplay: "+54 2323 448740",
   instagram: "fz.sstudio",
-  city: "Luján, Buenos Aires",
-  mapsQuery: "FZ Studio Barber Luján Buenos Aires",
+  city: "La Concepción Country Club, Luján",
+  mapsQuery: "La Concepción Country Club Luján Buenos Aires",
   step: 60,        // minutos entre turnos (duración del servicio)
   daysAhead: 21,   // días a futuro que se pueden reservar
   services: [
