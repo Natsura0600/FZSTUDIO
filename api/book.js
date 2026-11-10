@@ -1,4 +1,4 @@
-const { CONFIG, http, inRange, createBooking, handler, clean } = require("./_lib");
+const { CONFIG, http, inRange, createBooking, notify, handler, clean, shortDate, makeToken } = require("./_lib");
 
 module.exports = handler(async (req, res) => {
   if (req.method !== "POST") throw http(405, "Método no permitido");
@@ -16,5 +16,6 @@ module.exports = handler(async (req, res) => {
     service: svc.id, serviceName: svc.name, price: svc.price,
     status: "confirmed", source: "web"
   });
-  res.json({ ok: true, booking: { date, time, serviceName: svc.name, price: svc.price, name } });
+  await notify("Nuevo turno", `${name} · ${shortDate(date)} ${time} hs`, "new-" + booking.id);
+  res.json({ ok: true, token: makeToken(booking), booking: { date, time, serviceName: svc.name, price: svc.price, name } });
 });

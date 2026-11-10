@@ -93,11 +93,14 @@ $("#booking").addEventListener("submit", async e => {
   const btn = $("#submitBtn"); btn.disabled = true; btn.textContent = "Reservando…";
   try {
     const name = $("#name").value.trim(), phone = $("#phone").value.trim();
-    await api("/api/book", {
+    const resp = await api("/api/book", {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, phone, date: state.date, time: state.time, service: state.service.id, website: $("#website").value })
     });
     $("#booking").hidden = true; $("#done").hidden = false;
+    const cl = location.origin + "/cancelar?t=" + resp.token;
+    $("#cancelLink").href = cl; $("#cancelLink").textContent = "Cancelar mi turno";
+    try { localStorage.setItem("fz_last_cancel", cl); } catch {}
     $("#doneText").textContent = `${name}, te esperamos el ${label(state.date)} a las ${state.time} hs en FZ Studio.`;
     const msg = `Hola! Reservé un turno en FZ Studio: ${state.service.name}, ${label(state.date)} ${state.time} hs. Nombre: ${name}.`;
     $("#doneWa").href = `https://wa.me/${C.phone}?text=${encodeURIComponent(msg)}`;

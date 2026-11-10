@@ -15,57 +15,76 @@
 :root{--bg:#eee8dc;--card:#f7f2e8;--ink:#2e1a10;--brown:#4a2a18;--accent:#8a5a35;--mut:#7a6a5c;--line:#d3c8b4;--ok:#2f7d4f;--bad:#a3271a}
 *{box-sizing:border-box;margin:0;padding:0}
 [hidden]{display:none!important}
-body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.45;padding-bottom:90px}
+body{background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,'Segoe UI',sans-serif;line-height:1.45;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
 button{font:inherit;cursor:pointer}
-.top{background:var(--ink);color:var(--bg);padding:calc(14px + env(safe-area-inset-top)) 16px 14px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
-.top img{width:36px;height:36px;border-radius:8px;background:var(--bg)}
-.top h1{font-size:1.1rem;flex:1}
+.top{background:var(--ink);color:var(--bg);padding:calc(12px + env(safe-area-inset-top)) 16px 12px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:10}
+.top img{width:34px;height:34px;border-radius:8px;background:var(--bg)}
+.top h1{font-size:1.05rem;flex:1}
 .top button{background:transparent;color:var(--bg);border:1px solid rgba(238,232,220,.4);border-radius:8px;padding:6px 10px;font-size:.8rem}
-.wrap{max-width:720px;margin:0 auto;padding:16px}
+.wrap{max-width:720px;margin:0 auto;padding:14px}
 .login{max-width:360px;margin:12vh auto;padding:0 20px;text-align:center}
 .login img{width:110px;mix-blend-mode:multiply}
 .login h2{margin:8px 0 18px}
-input,select{width:100%;background:#fff8;border:1px solid var(--line);padding:12px;border-radius:10px;font:inherit;color:var(--ink)}
+input,select,textarea{width:100%;background:#fff8;border:1px solid var(--line);padding:12px;border-radius:10px;font:inherit;color:var(--ink)}
 .btn{background:var(--brown);color:var(--bg);border:0;border-radius:10px;padding:12px 18px;font-weight:600}
 .btn.full{width:100%;margin-top:12px}
 .btn.ghost{background:transparent;color:var(--brown);border:1px solid var(--brown)}
+.btn.sm{padding:8px 12px;font-size:.85rem}
 .err{color:var(--bad);font-size:.9rem;margin-top:10px;min-height:1.2em}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
-.stat b{display:block;font-size:1.5rem;color:var(--brown)}
-.stat span{font-size:.72rem;color:var(--mut)}
-.tabs{display:flex;gap:8px;margin-bottom:14px}
-.tab{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;color:var(--mut);font-weight:600}
-.tab.on{background:var(--brown);color:var(--bg);border-color:var(--brown)}
-.day{font-weight:700;color:var(--accent);margin:18px 0 8px;text-transform:capitalize}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center}
+.stat b{display:block;font-size:1.15rem;color:var(--brown)}
+.stat span{font-size:.66rem;color:var(--mut)}
+.dnav{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.dnav .t{flex:1;text-align:center;font-weight:700;text-transform:capitalize}
+.dnav button{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-weight:700}
+.dnav input{width:auto;padding:8px}
+.seg{display:flex;gap:6px;margin-bottom:12px}
+.seg button{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 4px;color:var(--mut);font-weight:600;font-size:.85rem}
+.seg button.on{background:var(--brown);color:var(--bg);border-color:var(--brown)}
+.search{margin-bottom:12px}
+.day{font-weight:700;color:var(--accent);margin:16px 0 8px;text-transform:capitalize}
 .item{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;display:flex;gap:12px}
-.item .t{font-weight:700;font-size:1.15rem;min-width:56px;color:var(--brown)}
+.item .t{font-weight:700;font-size:1.1rem;min-width:52px;color:var(--brown)}
+.item .t small{display:block;font-size:.7rem;color:var(--mut);font-weight:500}
 .item .m{flex:1;min-width:0}
 .item .n{font-weight:600;word-break:break-word}
-.item .s{font-size:.82rem;color:var(--mut)}
-.chip{display:inline-block;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.item .s{font-size:.8rem;color:var(--mut)}
+.item .note{font-size:.8rem;margin-top:4px;background:#fff8;border-radius:6px;padding:4px 8px}
+.free{border:1px dashed var(--line);border-radius:12px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:12px;color:var(--mut)}
+.free .t{font-weight:700;min-width:52px}
+.free span{flex:1;font-size:.85rem}
+.chip{display:inline-block;font-size:.68rem;font-weight:700;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
 .c-confirmed{background:#dbeedf;color:var(--ok)}
 .c-completed{background:#ddd;color:#555}
 .c-cancelled,.c-noshow{background:#f3d6d2;color:var(--bad)}
 .c-blocked{background:#e3d6c0;color:var(--accent)}
-.item.off{opacity:.55}
+.item.off{opacity:.6}
 .item.off .n{text-decoration:line-through}
 .acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.acts button,.acts a{background:#fff8;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:.8rem;color:var(--ink);text-decoration:none}
+.acts button,.acts a{background:#fff8;border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:.78rem;color:var(--ink);text-decoration:none}
 .acts .ok{background:var(--ok);color:#fff;border-color:var(--ok)}
 .acts .no{color:var(--bad)}
-.empty{text-align:center;color:var(--mut);padding:40px 0}
-.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));background:var(--brown);color:var(--bg);border:0;border-radius:999px;padding:14px 20px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+.empty{text-align:center;color:var(--mut);padding:36px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:12px}
+.card h3{font-size:.95rem;margin-bottom:6px}
+.card p{font-size:.85rem;color:var(--mut);margin-bottom:10px}
+.cli{display:flex;align-items:center;gap:10px}
+.cli .n{flex:1}
+.cli b{color:var(--brown)}
+.nav{position:fixed;left:0;right:0;bottom:0;background:var(--ink);display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:20}
+.nav button{flex:1;background:none;border:0;color:rgba(238,232,220,.6);padding:12px 4px;font-size:.78rem;font-weight:600}
+.nav button.on{color:#fff;box-shadow:inset 0 3px 0 var(--accent)}
+.fab{position:fixed;right:14px;bottom:calc(66px + env(safe-area-inset-bottom));background:var(--brown);color:var(--bg);border:0;border-radius:999px;padding:13px 18px;font-weight:700;box-shadow:0 6px 18px rgba(0,0,0,.3);z-index:15}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:30}
 .sheet{background:var(--bg);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:20px;max-height:92vh;overflow:auto}
 .sheet h3{margin-bottom:12px}
 .sheet label{display:block;font-size:.8rem;font-weight:600;color:var(--accent);margin:12px 0 4px}
-.seg{display:flex;gap:8px}
-.seg button{flex:1;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px;font-weight:600}
-.seg button.on{background:var(--brown);color:var(--bg)}
 .row{display:flex;gap:8px;margin-top:16px}
 .row .btn{flex:1}
 .hint{font-size:.78rem;color:var(--mut);margin-top:12px}
+.toast{position:fixed;top:calc(10px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--brown);color:var(--bg);padding:12px 18px;border-radius:12px;z-index:50;box-shadow:0 6px 20px rgba(0,0,0,.35);max-width:90%;font-size:.9rem;font-weight:600}
+.toast.bad{background:var(--bad)}
 </style>
 </head>
 <body>
@@ -85,40 +104,38 @@ input,select{width:100%;background:#fff8;border:1px solid var(--line);padding:12
     <img src="../img/logo.png" alt="">
     <h1>FZ Studio · Turnos</h1>
     <button id="refresh" type="button">Actualizar</button>
-    <button id="logout" type="button">Salir</button>
   </div>
-  <div class="wrap">
-    <div class="stats">
-      <div class="stat"><b id="sToday">0</b><span>Hoy</span></div>
-      <div class="stat"><b id="sNext">0</b><span>Próximos</span></div>
-      <div class="stat"><b id="sMoney">$0</b><span>Estimado del mes</span></div>
-    </div>
-    <div class="tabs">
-      <button class="tab on" data-v="today" type="button">Hoy</button>
-      <button class="tab" data-v="next" type="button">Próximos</button>
-      <button class="tab" data-v="past" type="button">Historial</button>
-    </div>
-    <div id="list"></div>
-  </div>
+  <div class="wrap" id="main"></div>
   <button class="fab" id="fab" type="button">+ Turno</button>
+  <nav class="nav" id="nav">
+    <button data-t="agenda" class="on">Agenda</button>
+    <button data-t="list">Turnos</button>
+    <button data-t="clients">Clientes</button>
+    <button data-t="settings">Ajustes</button>
+  </nav>
 </section>
 
 <div class="modal" id="modal" hidden>
   <div class="sheet">
-    <h3>Nuevo</h3>
+    <h3 id="mTitle">Nuevo</h3>
     <div class="seg" id="kind">
-      <button type="button" data-k="book" class="on">Turno manual</button>
-      <button type="button" data-k="block">Bloquear horario</button>
+      <button type="button" data-k="book" class="on">Turno</button>
+      <button type="button" data-k="block">Bloquear hora</button>
+      <button type="button" data-k="blockday">Bloquear día</button>
     </div>
     <label for="mDate">Día</label>
     <select id="mDate"></select>
-    <label for="mTime">Horario</label>
-    <select id="mTime"></select>
+    <div id="mTimeBox">
+      <label for="mTime">Horario</label>
+      <select id="mTime"></select>
+    </div>
     <div id="mClient">
       <label for="mName">Nombre del cliente</label>
       <input id="mName" maxlength="60" placeholder="Nombre">
       <label for="mPhone">Teléfono (opcional)</label>
       <input id="mPhone" type="tel" placeholder="2323 000000">
+      <label for="mNote">Nota (opcional)</label>
+      <input id="mNote" maxlength="200" placeholder="Ej: corte bajo, pagó seña">
     </div>
     <p class="err" id="mErr"></p>
     <div class="row">
@@ -128,6 +145,7 @@ input,select{width:100%;background:#fff8;border:1px solid var(--line);padding:12
     <p class="hint">Solo se muestran horarios libres.</p>
   </div>
 </div>
+<div class="toast" id="toast" hidden></div>
 
 <script src="admin.js"></script>
 </body>

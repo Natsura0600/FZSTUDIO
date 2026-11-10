@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cancelar turno | FZ Studio Barber</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="img/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main class="section" style="max-width:520px;padding-top:60px;text-align:center">
+  <img src="img/logo.png" alt="FZ" style="width:100px;mix-blend-mode:multiply">
+  <h2 style="margin-top:6px">Tu turno</h2>
+  <div class="booking" id="box" style="text-align:left"><p class="hint">Cargando…</p></div>
+  <p class="fine"><a href="/">← Volver a la web</a></p>
+</main>
+<script>
+const box = document.getElementById("box");
+const t = new URLSearchParams(location.search).get("t");
+const DAYS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const MONTHS = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const label = iso => { const [y,m,d] = iso.split("-").map(Number); return `${DAYS[new Date(Date.UTC(y,m-1,d)).getUTCDay()]} ${d} de ${MONTHS[m-1]}`; };
+(async () => {
+  try {
+    const res = await fetch("/api/cancel?t=" + encodeURIComponent(t || ""));
+    const j = await res.json();
+    if (!res.ok) throw new Error(j.error);
+    box.innerHTML = `<p><b>${esc(j.name)}</b>, tenés turno el <b>${label(j.date)}</b> a las <b>${esc(j.time)} hs</b>.<br>${esc(j.serviceName)}</p>` +
+      (j.canCancel
+        ? `<p class="error" id="e"></p><button class="btn btn-block" id="c">Cancelar turno</button>`
+        : `<p class="hint" style="margin-top:14px">Ya no se puede cancelar online (hasta ${j.minHours} hs antes). Escribinos por <a class="fine" href="https://wa.me/${j.phone}">WhatsApp</a>.</p>`);
+    const c = document.getElementById("c");
+    if (c) c.onclick = async () => {
+      if (!confirm("¿Seguro que querés cancelar el turno?")) return;
+      c.disabled = true;
+      const r = await fetch("/api/cancel", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ t }) });
+      const k = await r.json();
+      if (!r.ok) { document.getElementById("e").textContent = k.error; c.disabled = false; return; }
+      box.innerHTML = `<p style="text-align:center"><b>Turno cancelado.</b><br>Cuando quieras, podés <a class="fine" href="/#turnos">reservar otro</a>.</p>`;
+    };
+  } catch (e) { box.innerHTML = `<p>${esc(e.message || "No se pudo cargar el turno")}</p>`; }
+})();
+</script>
+</body>
+</html>
