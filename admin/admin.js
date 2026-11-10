@@ -188,6 +188,9 @@ function renderSettings() {
     <div class="card"><h3>Sesión</h3><button class="btn sm ghost" data-s="logout">Cerrar sesión</button></div>`;
 }
 
+function animate() { // las animaciones solo corren al cambiar de pestaña/día, no en cada refresco
+  const m = $("#main"); m.classList.add("anim"); clearTimeout(animate.h); animate.h = setTimeout(() => m.classList.remove("anim"), 800);
+}
 function render() {
   const el = $("#main"), keep = document.activeElement && document.activeElement.id === "q";
   el.innerHTML = tab === "agenda" ? renderAgenda() : tab === "list" ? renderList() : tab === "clients" ? renderClients() : renderSettings();
@@ -199,8 +202,8 @@ function render() {
 $("#main").addEventListener("click", async e => {
   const t = e.target.closest("button,input"); if (!t) return;
   const d = t.dataset;
-  if (d.nav) { day = d.nav === "today" ? today : addDays(day, +d.nav); return render(); }
-  if (d.sub) { sub = d.sub; return render(); }
+  if (d.nav) { day = d.nav === "today" ? today : addDays(day, +d.nav); animate(); return render(); }
+  if (d.sub) { sub = d.sub; animate(); return render(); }
   if (d.new) return openModal({ time: d.new });
   if (d.s) return settingsAction(d.s);
   if (d.a) return bookingAction(d.a, d.k);
@@ -253,7 +256,8 @@ async function enablePush() {
 
 $("#nav").addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b) return;
-  tab = b.dataset.t; q = ""; document.querySelectorAll("#nav button").forEach(x => x.classList.toggle("on", x === b)); render(); scrollTo(0, 0);
+  tab = b.dataset.t; q = ""; document.querySelectorAll("#nav button").forEach(x => x.classList.toggle("on", x === b));
+  animate(); render(); scrollTo(0, 0);
 });
 $("#fab").addEventListener("click", () => openModal({ time: "" }));
 $("#refresh").addEventListener("click", () => load());

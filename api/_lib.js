@@ -64,7 +64,7 @@ function arNow() {
   const d = new Date();
   return {
     date: d.toLocaleDateString("en-CA", { timeZone: TZ }),
-    time: d.toLocaleTimeString("en-GB", { timeZone: TZ, hour: "2-digit", minute: "2-digit" })
+    time: d.toLocaleTimeString("en-GB", { timeZone: TZ, hour: "2-digit", minute: "2-digit", hourCycle: "h23" })
   };
 }
 const toMin = t => { const [h, m] = t.split(":").map(Number); return h * 60 + m; };
@@ -160,13 +160,21 @@ function handler(fn) {
   };
 }
 
+const clientIp = req => String((req.headers && req.headers["x-forwarded-for"]) || "x").split(",")[0].trim();
+const fails = new Map(); // límite de intentos en memoria (sin gastar comandos de Redis)
 function requireAdmin(req) {
   const pass = process.env.ADMIN_PASSWORD;
   if (!pass) throw http(503, "Falta configurar ADMIN_PASSWORD en Vercel");
+  const ip = clientIp(req), f = fails.get(ip);
+  if (f && f.n >= 8 && Date.now() - f.t < 15 * 60000) throw http(429, "Demasiados intentos. Probá en 15 minutos");
   const given = String(req.headers["x-admin-key"] || "");
   const a = crypto.createHash("sha256").update(given).digest();
   const b = crypto.createHash("sha256").update(pass).digest();
-  if (!crypto.timingSafeEqual(a, b)) throw http(401, "Contraseña incorrecta");
+  if (!crypto.timingSafeEqual(a, b)) {
+    fails.set(ip, { n: (f && Date.now() - f.t < 15 * 60000 ? f.n : 0) + 1, t: Date.now() });
+    throw http(401, "Contraseña incorrecta");
+  }
+  fails.delete(ip);
 }
 
 const clean = (s, n) => String(s || "").replace(/[<>]/g, "").trim().slice(0, n);
@@ -180,5 +188,5 @@ function parseToken(t) {
 module.exports = {
   CONFIG, r, rp, http, arNow, addDays, slotsFor, isPast, inRange, monthKey, slotField, bump,
   createBooking, getBooking, cancelBooking, loadRange, notify, pushEnabled, handler, requireAdmin,
-  clean, shortDate, makeToken, parseToken
+  clean, shortDate, makeToken, parseToken, clientIp
 };

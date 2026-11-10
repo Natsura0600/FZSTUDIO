@@ -4,58 +4,75 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FZ Studio Barber | Barbería en Luján</title>
-<meta name="description" content="FZ Studio Barber, barbería en Luján. Atención personalizada. Reservá tu turno online.">
+<meta name="description" content="FZ Studio Barber, barbería en La Concepción Country Club, Luján. Atención personalizada. Reservá tu turno online.">
 <meta name="theme-color" content="#eee8dc">
+<meta property="og:type" content="website">
+<meta property="og:title" content="FZ Studio Barber | Barbería en Luján">
+<meta property="og:description" content="Tu estilo, nuestra dedicación. Reservá tu turno online.">
+<meta property="og:locale" content="es_AR">
 <link rel="icon" href="img/icon-192.png">
 <link rel="apple-touch-icon" href="img/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
+<script>document.documentElement.classList.add("js")</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BarberShop","name":"FZ Studio Barber","telephone":"+542323448740","address":{"@type":"PostalAddress","addressLocality":"Luján","addressRegion":"Buenos Aires","addressCountry":"AR"},"sameAs":["https://instagram.com/fz.sstudio"],"priceRange":"$$"}
+</script>
 </head>
 <body>
+<div class="progress" id="progress"></div>
 
 <header class="nav" id="nav">
-  <a href="#inicio" class="brand"><img src="img/logo.png" alt="FZ"><span>FZ Studio</span></a>
-  <nav>
+  <a href="#inicio" class="brand"><img src="img/logo.png" alt="FZ" width="44" height="44"><span>FZ Studio</span></a>
+  <nav id="menu" aria-label="Principal">
     <a href="#servicios">Servicio</a>
     <a href="#turnos">Turnos</a>
     <a href="#local">El local</a>
     <a href="#contacto">Contacto</a>
   </nav>
-  <a href="#turnos" class="btn btn-sm">Reservar</a>
+  <div class="nav-r">
+    <a href="#turnos" class="btn btn-sm">Reservar</a>
+    <button class="burger" id="burger" type="button" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button>
+  </div>
 </header>
 
 <section class="hero" id="inicio">
-  <img class="hero-logo" src="img/logo.png" alt="FZ Studio">
-  <p class="eyebrow">Barbería · Luján</p>
-  <h1>Tu estilo,<br>nuestra dedicación.</h1>
-  <p class="lead">Un espacio donde el estilo, la precisión y los detalles hacen la diferencia. Atención personalizada, adaptada a tu imagen.</p>
-  <div class="cta">
-    <a href="#turnos" class="btn">Reservar turno</a>
-    <a href="#servicios" class="btn btn-ghost">Ver servicio</a>
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-in">
+    <img class="hero-logo" src="img/logo.png" alt="FZ Studio" width="130" height="130">
+    <p class="eyebrow">Barbería · Luján</p>
+    <h1>Tu estilo,<br>nuestra dedicación.</h1>
+    <p class="lead">Un espacio donde el estilo, la precisión y los detalles hacen la diferencia. Atención personalizada, adaptada a tu imagen.</p>
+    <div class="status" id="status" hidden><i></i><span></span></div>
+    <div class="cta">
+      <a href="#turnos" class="btn">Reservar turno</a>
+      <a href="#servicios" class="btn btn-ghost">Ver servicio</a>
+    </div>
   </div>
+  <a class="scroll" href="#servicios" aria-label="Bajar"><span></span></a>
 </section>
 
 <section class="section" id="servicios">
-  <p class="eyebrow">Lo que hacemos</p>
-  <h2>Servicio</h2>
+  <p class="eyebrow rv">Lo que hacemos</p>
+  <h2 class="rv" style="--d:.08s">Servicio</h2>
   <div class="cards" id="serviceCards"></div>
 </section>
 
 <section class="section dark" id="turnos">
-  <p class="eyebrow">Reservá online</p>
-  <h2>Sacá tu turno</h2>
-  <p class="sub">Elegí día y horario. Tu turno queda confirmado al instante.</p>
+  <p class="eyebrow rv">Reservá online</p>
+  <h2 class="rv" style="--d:.08s">Sacá tu turno</h2>
+  <p class="sub rv" style="--d:.14s">Elegí día y horario. Tu turno queda confirmado al instante.</p>
 
-  <form id="booking" class="booking" autocomplete="off">
+  <form id="booking" class="booking rv" style="--d:.2s" novalidate>
     <div class="step" id="svcStep" hidden>
       <label>Servicio</label>
       <div class="chips" id="serviceChips"></div>
     </div>
     <div class="step">
       <label>1 · Día</label>
-      <div class="chips days" id="dayChips"></div>
+      <div class="chips days" id="dayChips"><span class="hint">Cargando días…</span></div>
     </div>
     <div class="step">
       <label>2 · Horario</label>
@@ -64,21 +81,21 @@
     <div class="step two">
       <div>
         <label for="name">3 · Tu nombre</label>
-        <input id="name" type="text" placeholder="Nombre y apellido" maxlength="60" required>
+        <input id="name" name="name" type="text" placeholder="Nombre y apellido" maxlength="60" autocomplete="name" required>
       </div>
       <div>
         <label for="phone">Tu teléfono</label>
-        <input id="phone" type="tel" placeholder="2323 000000" maxlength="20" required>
+        <input id="phone" name="phone" type="tel" inputmode="tel" placeholder="2323 000000" maxlength="20" autocomplete="tel" required>
       </div>
     </div>
-    <input type="text" name="website" id="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
+    <input type="text" name="website" id="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0" aria-hidden="true">
     <div class="summary" id="summary">Completá los pasos para ver el resumen.</div>
     <p class="error" id="err" role="alert"></p>
     <button class="btn btn-block" id="submitBtn" type="submit">Confirmar turno</button>
   </form>
 
   <div class="booking done" id="done" hidden>
-    <div class="tick">✓</div>
+    <svg class="tick" viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M14 27l8 8 16-17"/></svg>
     <h3>¡Turno confirmado!</h3>
     <p id="doneText"></p>
     <p class="fine">Si no podés venir, cancelá desde este link (guardalo): <a id="cancelLink" href="#"></a></p>
@@ -88,45 +105,46 @@
 </section>
 
 <section class="section" id="local">
-  <p class="eyebrow">Conocé el espacio</p>
-  <h2>El local</h2>
+  <p class="eyebrow rv">Conocé el espacio</p>
+  <h2 class="rv" style="--d:.08s">El local</h2>
   <div class="local">
-    <iframe class="mapbox" title="Ubicación de FZ Studio Barber" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+    <iframe class="mapbox rv" style="--d:.12s" title="Ubicación de FZ Studio Barber" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
       src="https://www.google.com/maps?q=La+Concepci%C3%B3n+Country+Club+Luj%C3%A1n+Buenos+Aires&output=embed"></iframe>
-    <div>
+    <div class="rv" style="--d:.24s">
       <p>Nos encontrás en La Concepción Country Club, Luján. Un lugar cómodo y prolijo, pensado para que disfrutes el momento y te vayas con tu mejor versión.</p>
       <p><a class="btn btn-sm" href="https://www.google.com/maps/search/?api=1&query=La+Concepci%C3%B3n+Country+Club+Luj%C3%A1n+Buenos+Aires" target="_blank" rel="noopener">Cómo llegar</a></p>
-      <p class="fine">Seguinos en Instagram <a id="igLink" href="#" target="_blank" rel="noopener">@fz.sstudio</a> para ver más trabajos.</p>
+      <p class="fine">Seguinos en Instagram <a id="igLink" href="https://instagram.com/fz.sstudio" target="_blank" rel="noopener">@fz.sstudio</a> para ver más trabajos.</p>
     </div>
   </div>
 </section>
 
 <section class="section dark" id="contacto">
-  <p class="eyebrow">Visitanos</p>
-  <h2>Horarios y ubicación</h2>
+  <p class="eyebrow rv">Visitanos</p>
+  <h2 class="rv" style="--d:.08s">Horarios y contacto</h2>
   <div class="contact">
-    <div class="box">
+    <div class="box rv" style="--d:.1s">
       <h3>Horarios</h3>
       <ul class="hours" id="hoursList"></ul>
     </div>
-    <div class="box">
+    <div class="box rv" style="--d:.22s">
       <h3>Dónde estamos</h3>
       <p id="addr"></p>
-      <p><a id="waLink" class="btn btn-sm" href="#" target="_blank" rel="noopener">Escribinos por WhatsApp</a></p>
-      <p><a id="mapLink" class="btn btn-sm btn-ghost" href="#" target="_blank" rel="noopener">Cómo llegar</a></p>
+      <p><a id="waLink" class="btn btn-sm" href="https://wa.me/5492323448740" target="_blank" rel="noopener">Escribinos por WhatsApp</a></p>
+      <p><a id="mapLink" class="btn btn-sm btn-ghost" href="https://www.google.com/maps/search/?api=1&query=La+Concepci%C3%B3n+Country+Club+Luj%C3%A1n+Buenos+Aires" target="_blank" rel="noopener">Cómo llegar</a></p>
     </div>
   </div>
 </section>
 
 <footer>
-  <img src="img/logo.png" alt="FZ" class="flogo">
-  <p>© <span id="year"></span> FZ Studio Barber · Luján, Buenos Aires</p>
+  <img src="img/logo.png" alt="FZ" class="flogo" width="70" height="70" loading="lazy">
+  <p>© <span id="year">2026</span> FZ Studio Barber · Luján, Buenos Aires</p>
 </footer>
 
-<a id="waFloat" class="wa-float" href="#" target="_blank" rel="noopener" aria-label="WhatsApp">
-  <svg viewBox="0 0 32 32" width="28" height="28" fill="#fff"><path d="M16 3a13 13 0 0 0-11 19.8L3 29l6.4-2A13 13 0 1 0 16 3zm0 23.6a10.600 10.600 0 0 1-5.400-1.500l-.4-.2-3.800 1.200 1.200-3.700-.3-.4A10.600 10.600 0 1 1 16 26.600zm5.800-7.900c-.3-.2-1.900-.9-2.200-1s-.5-.2-.7.200-.8 1-1 1.200-.4.200-.7 0a8.700 8.700 0 0 1-4.300-3.800c-.3-.6.300-.5.900-1.700.1-.2 0-.4 0-.5l-1-2.300c-.2-.6-.5-.5-.7-.5h-.6a1.200 1.200 0 0 0-.9.400 3.700 3.700 0 0 0-1.100 2.700 6.400 6.400 0 0 0 1.400 3.400 14.600 14.600 0 0 0 5.600 4.900c2.100.9 2.900.9 3.400.8a3 3 0 0 0 2-1.400 2.500 2.500 0 0 0 .2-1.400c-.1-.1-.3-.2-.6-.4z"/></svg>
+<a id="waFloat" class="wa-float" href="https://wa.me/5492323448740" target="_blank" rel="noopener" aria-label="WhatsApp">
+  <svg viewBox="0 0 32 32" width="28" height="28" fill="#fff" aria-hidden="true"><path d="M16 3a13 13 0 0 0-11 19.8L3 29l6.4-2A13 13 0 1 0 16 3zm0 23.6a10.600 10.600 0 0 1-5.400-1.500l-.4-.2-3.800 1.200 1.200-3.700-.3-.4A10.600 10.600 0 1 1 16 26.600zm5.800-7.900c-.3-.2-1.900-.9-2.200-1s-.5-.2-.7.200-.8 1-1 1.200-.4.200-.7 0a8.700 8.700 0 0 1-4.300-3.800c-.3-.6.300-.5.900-1.700.1-.2 0-.4 0-.5l-1-2.300c-.2-.6-.5-.5-.7-.5h-.6a1.200 1.200 0 0 0-.9.400 3.700 3.700 0 0 0-1.100 2.700 6.400 6.400 0 0 0 1.400 3.400 14.600 14.600 0 0 0 5.600 4.900c2.100.9 2.900.9 3.400.8a3 3 0 0 0 2-1.400 2.500 2.500 0 0 0 .2-1.400c-.1-.1-.3-.2-.6-.4z"/></svg>
 </a>
 
+<noscript><p style="text-align:center;padding:16px">Activá JavaScript para reservar turnos online, o escribinos por WhatsApp al +54 2323 448740.</p></noscript>
 <script src="app.js"></script>
 </body>
 </html>
